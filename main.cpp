@@ -2,31 +2,37 @@
 #include <fstream>
 #include <string>
 
+#include "stdio.h"
 #include "ctype.h"
 
 using namespace std;
 
-void lexan(char symbol)
+static const unsigned int MAX_BUF = 256;
+
+int lexan(char symbol)
 {
     unsigned int lineno = 0;
 
-    if (isdigit(symbol)) { //symbol - numeral
+    if (isdigit(symbol)) {          //symbol - numeral
         cerr << symbol << endl;
-    } else if (isalpha(symbol)) {
-        // *some code*
+    } else if (isalpha(symbol)) {   //symbol - char
+        cerr << symbol << endl;
     } else switch (symbol) {
+        case '#':
+            return '#';
         case '+':
             cerr << '+' << endl;
             break;
         case '\n':
             ++lineno;
             cerr << "lineno = " << lineno << endl;
-            break;
+            return '\n';
         case ' ':
         case '\t':
         default:
-            break;
+            return -1;
     }
+    return 0;
 }
 
 int main(int argc, char const *argv[]) {
@@ -37,7 +43,15 @@ int main(int argc, char const *argv[]) {
     char c;
     while (ifs.get(c)) {
         // cout << ' ' << c;
-        lexan(c);
+        int token = lexan(c);
+        if (token == '#') {
+            do {
+                printf("%d\n", token);
+                ifs.get(c);
+                token = lexan(c);
+            } while (c == '\n');
+            printf("exit from do while()\n");
+        }
     }
 
     ifs.close();

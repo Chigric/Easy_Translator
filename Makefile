@@ -10,7 +10,7 @@ CFLAGS  = -g -Wall
 SOURCES = main.cpp
 OBJECTS = $(SOURCES: .cpp=.o)
 EXECUTABLE = work.a
-DATA = data.txt
+DATA = data/input.txt
 
 all: $(SOURCES) $(EXECUTABLE)
 
@@ -23,5 +23,5 @@ $(EXECUTABLE): $(OBJECTS)
 clean:
 	$(RM) $(EXECUTABLE)
 
-do: $(SOURCES) $(EXECUTABLE)
+do: all
 	./$(EXECUTABLE) $(DATA)
