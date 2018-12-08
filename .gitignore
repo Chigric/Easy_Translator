@@ -5,3 +5,6 @@
 
 # Other Code
 *.py
+
+# Objects files
+*.o

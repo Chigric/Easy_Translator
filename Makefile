@@ -4,11 +4,14 @@ CC = g++
 # compiler flags:
 #  -g    adds debugging information to the executable file
 #  -Wall turns on most, but not all, compiler warnings
-CFLAGS  = -g -Wall
+#	-c into and an object file (.o file)
+CFLAGS  = -c -g -Wall --std=c++11
+
+LDFLAGS =
 
 # the build target executable:
 SOURCES = main.cpp
-OBJECTS = $(SOURCES: .cpp=.o)
+OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = work.a
 DATA = data/input.txt
 
@@ -21,7 +24,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	$(RM) $(EXECUTABLE)
+	$(RM) $(EXECUTABLE) $(OBJECTS)
 
 do: all
 	./$(EXECUTABLE) $(DATA)
