@@ -10,9 +10,10 @@ CFLAGS  = -c -g -Wall --std=c++11
 LDFLAGS =
 
 # the build target executable:
-SOURCES = main.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
-EXECUTABLE = work.a
+SOURCES = $(addsuffix .cpp, main parser)
+OBJ_DIR = obj
+OBJECTS = $(addprefix $(OBJ_DIR)/,$(SOURCES:.cpp=.o))
+EXECUTABLE = $(OBJ_DIR)/work.a
 DATA = data/input.txt
 
 all: $(SOURCES) $(EXECUTABLE)
@@ -20,7 +21,7 @@ all: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.cpp.o:
+$(OBJ_DIR)/%.o: %.cpp
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:

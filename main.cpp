@@ -5,6 +5,8 @@
 #include "stdio.h"
 #include "ctype.h"
 
+#include "parser.h"
+
 using namespace std;
 
 static const unsigned int MAX_BUF = 256;
@@ -53,6 +55,8 @@ int main(int argc, char const *argv[]) {
             printf("exit from do while()\n");
         }
     }
+
+    parser();
 
     ifs.close();
     return 0;
