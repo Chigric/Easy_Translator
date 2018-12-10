@@ -5,7 +5,10 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
-    Parser pars;
-    pars.parse(argv[1]);
+    Parser* pars = new Parser;
+    pars->parse(argv[1]);
+
+    delete pars;
+
     return 0;
 }

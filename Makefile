@@ -14,7 +14,7 @@ LDFLAGS =
 # helper = http://www.opennet.ru/docs/RUS/gnumake/#Multi-config_multi-dirs
 # the build target executable:
 SRC_DIR = source
-SOURCES = $(addsuffix .cpp, main parser)
+SOURCES = $(addsuffix .cpp, main parser lexer logger)
 OBJ_DIR = obj
 OBJECTS = $(addprefix $(OBJ_DIR)/,$(SOURCES:.cpp=.o))
 
