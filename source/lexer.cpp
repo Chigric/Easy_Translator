@@ -15,6 +15,40 @@ Lexer::~Lexer()
         delete logger;
 }
 
+void Lexer::commentLine()
+{
+    std::string tmp;
+
+    printStatus = false;
+    iStream->unget();
+    getline(static_cast<std::istream&>(*iStream), tmp);
+    iStream->unget();
+
+    std::cout << "\tlexan (comment line) " << tmp << std::endl;
+}
+
+void Lexer::number(SyntacticWord* curToken, char symbol)
+{
+    curToken->token_id = NUM;
+
+    while (isdigit(symbol)) {
+        curToken->lexbuf.push_back(symbol);
+        nextChar(symbol);
+    }
+    iStream->unget();
+    std::cout << "\tlexan (full number) " <<
+        curToken->lexbuf << std::endl;
+}
+
+void Lexer::readString(SyntacticWord* curToken, char symbol)
+{
+	while (isalnum(symbol)) {
+		curToken->lexbuf.push_back(symbol);
+		nextChar(symbol);
+	}
+	iStream->unget();
+}
+
 const int Lexer::lexan(SyntacticWord* curToken)
 {
 	curToken->clear();
@@ -31,15 +65,7 @@ const int Lexer::lexan(SyntacticWord* curToken)
 		if (symbol == ' ' || symbol == '\t')	//symbol - nothing
 			continue;
 		else if (symbol == '#') {
-			printStatus = false;
-			iStream->unget();
-			getline(static_cast<std::istream&>(*iStream), curToken->lexbuf);
-			iStream->unget();
-
-			std::cout << "\tlexan (comment line) " <<
-			 	curToken->lexbuf << std::endl;
-			curToken->clear();
-
+            commentLine();
 			continue;
 		} else if (symbol == '\n') {	//symbol - new line
 			if (printStatus == false)
@@ -48,51 +74,29 @@ const int Lexer::lexan(SyntacticWord* curToken)
 			continue;
 		} else if (isdigit(symbol)) {	//symbol - numeral
 	        std::cout << "\tlexan (digit) " << symbol << std::endl;
-			curToken->token_id = NUM;
-
-			while (isdigit(symbol)) {
-				curToken->lexbuf.push_back(symbol);
-				nextChar(symbol);
-			}
-			iStream->unget();
-			std::cout << "\tlexan (full number) " <<
-				curToken->lexbuf << std::endl;
+            number(curToken, symbol);
 			return NUM;
 
 	    } else if (isalpha(symbol) || symbol == '_') {   //symbol - char
 	        std::cout << "\tlexan (alpha) " << symbol << std::endl;
-
-			while (isalnum(symbol)) {
-				curToken->lexbuf.push_back(symbol);
-				nextChar(symbol);
-			}
-			iStream->unget();
-
-			if (curToken->lexbuf == "if") {
-				curToken->token_id = IF;
-				return IF;
-			} else if (curToken->lexbuf == "else") {
-				curToken->token_id = ELSE;
-				return ELSE;
-			} else {
-				logger->warning(__func__, "Unkown word: " + curToken->lexbuf);
-				return NONE;
-			}
+            readString(curToken, symbol);
+        	if (curToken->lexbuf == "if") {
+        		return IF;
+        	} else if (curToken->lexbuf == "else") {
+        		return ELSE;
+        	} else {
+        		logger->warning(__func__, "Unkown word: " + curToken->lexbuf);
+        		return NONE;
+        	}
 
 	    } else if (symbol == '<') { 	//symbol - operator '<'
 			std::cout << "\tlexan (LESS) " << symbol << std::endl;
-			curToken->lexbuf.push_back(symbol);
-			curToken->token_id = LESS;
-
 			return LESS;
 		} else if (symbol == '=') {		//symbol = operator '='
 		 nextChar(symbol);
-		 curToken->lexbuf.push_back(symbol);
 
 			if (symbol == '=') {		//symbol = operator "=="
 				std::cout << "\tlexan (COMPARE) " << symbol << std::endl;
-				curToken->lexbuf.push_back(symbol);
-				curToken->token_id = LESS;
 				return COMPARE;
 			}
 			else

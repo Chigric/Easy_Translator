@@ -12,6 +12,9 @@ private:
     std::ifstream* iStream;
     Logger* logger;
 
+    void commentLine();
+    void number(SyntacticWord*, char);
+    void readString(SyntacticWord*, char);
     //Lexer
     void nextChar(char&);
 public:
