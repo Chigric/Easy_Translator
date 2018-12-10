@@ -1,4 +1,5 @@
 #include <iostream>
+//#include <iomanip>
 
 #include <stdio.h>
 #include <ctype.h>
@@ -6,13 +7,12 @@
 
 #include "parser.h"
 
-using namespace std;
-
 Parser::Parser()
 {
 	printStatus = true;
 	lineno = 0;
 	charno = 0;
+	lookahead = NONE;
 
 	curToken = new Variable;
 	iStream = nullptr;
@@ -31,21 +31,22 @@ Parser::~Parser()
 
 void Parser::parse(const char* fileName)
 {
-	iStream = new ifstream;
-    iStream->open(fileName, ifstream::in);
+	iStream = new std::ifstream;
+    iStream->open(fileName, std::ifstream::in);
 
-	if (this->lexan() == NONE) {
-		std::cerr << "ERROR 0x3: some problem with lexan\n";
-		return;
+	if ((lookahead = this->lexan()) == DONE) {
+		this->error(__func__, "some problem with lexan", 0x3);
+		exit(0x3);
 	}
-	this->printToken();
+	expr();
+	// this->printToken();
 
     iStream->close();
 }
 
 void Parser::printToken()
 {
-	if (printStatus == true || curToken->token_id != NONE)
+	if (printStatus == true || lookahead != DONE)
 		std::cout << curToken->lexbuf << std::endl;
 }
 
@@ -57,7 +58,7 @@ const int Parser::lexan()
 		return -1;
 
 	char symbol;
-	while (true) {
+	while (!(iStream->eof())) {
 		nextChar(symbol);
 
 		std::cout << "lexan " << symbol << std::endl;
@@ -68,6 +69,8 @@ const int Parser::lexan()
 			printStatus = false;
 			iStream->unget();
 			getline(static_cast<std::istream&>(*iStream), curToken->lexbuf);
+			iStream->unget();
+
 			std::cout << "\tlexan (comment line) " <<
 			 	curToken->lexbuf << std::endl;
 			curToken->clear();
@@ -91,49 +94,132 @@ const int Parser::lexan()
 			iStream->unget();
 			std::cout << "\tlexan (full number) " <<
 				curToken->lexbuf << std::endl;
-			return 0;
+			return NUM;
 
 	    } else if (isalpha(symbol) || symbol == '_') {   //symbol - char
 	        std::cout << "\tlexan (alpha) " << symbol << std::endl;
-			curToken->token_id = STRING;
 
 			while (isalnum(symbol)) {
 				curToken->lexbuf.push_back(symbol);
 				nextChar(symbol);
 			}
 			iStream->unget();
-			return 0;
+
+			if (curToken->lexbuf == "if") {
+				curToken->token_id = IF;
+				return IF;
+			} else if (curToken->lexbuf == "else") {
+				curToken->token_id = ELSE;
+				return ELSE;
+			} else {
+				this->warning(__func__, "Unkown word: " + curToken->lexbuf);
+				return NONE;
+			}
 
 	    } else if (symbol == '<') { 	//symbol - operator '<'
 			std::cout << "\tlexan (LESS) " << symbol << std::endl;
+			curToken->lexbuf.push_back(symbol);
+			curToken->token_id = LESS;
 
 			return LESS;
 		} else if (symbol == '=') {		//symbol = operator '='
 		 nextChar(symbol);
-			if (symbol == '=')			//symbol = operator "=="
-				return NONE;
+		 curToken->lexbuf.push_back(symbol);
+
+			if (symbol == '=') {		//symbol = operator "=="
+				std::cout << "\tlexan (COMPARE) " << symbol << std::endl;
+				curToken->lexbuf.push_back(symbol);
+				curToken->token_id = LESS;
+				return COMPARE;
+			}
 			else
-				return -1;
+				return NONE;
 		} else if (iStream->eof()) {
-			curToken->token_id = NONE;
-			return NONE;
-		} else {
 			curToken->token_id = DONE;
 			return DONE;
+		} else {
+			curToken->token_id = NONE;
+			return symbol;
 		}
 	}
-	return -1;
+	return DONE;
 }
 
 
 void Parser::nextChar(char& _c)
 {
-	if (iStream == nullptr) {
-		std::cerr << "ERROR 0x2: in nextChar():" <<
-			"(" << lineno << ":" << charno << ") " <<
-			"ты совсем ку-ку,\niStream = nullptr\n";
-		return;
-	}
+	if (iStream == nullptr)
+		this->error(__func__, "ты совсем ку-ку,\niStream = nullptr", 0x2);
+
 	iStream->get(_c);
 	++charno;
+}
+
+void Parser::expr()
+{
+	while (lookahead != DONE) {
+		std::cout << "> expr:\t" << logic() << std::endl;
+		match(';');
+	}
+}
+
+int Parser::logic()
+{
+	Variable ptr = (*curToken);
+	match(NUM);
+	switch (lookahead) {
+		int tmp1, tmp2, answer;
+		case LESS:
+			match(LESS);
+			if (ptr.token_id == (*curToken).token_id) {
+				tmp1 = stoi(ptr.lexbuf);
+				tmp2 = stoi((*curToken).lexbuf);
+				answer = (tmp1 < tmp2);
+			} else
+				this->error(__func__, "Syntex error", 0x6);
+
+			match(NUM);
+			return answer;
+		case COMPARE:
+			match(COMPARE);
+			if (ptr.token_id == (*curToken).token_id) {
+				tmp1 = stoi(ptr.lexbuf);
+				tmp2 = stoi((*curToken).lexbuf);
+				answer = (tmp1 == tmp2);
+			} else
+				this->error(__func__, "Syntex error", 0x7);
+
+			match(NUM);
+			return answer;
+		default:
+			break;
+	}
+	return ptr.token_id;
+}
+
+void Parser::match(int token)
+{
+	if (lookahead == token)
+		lookahead = lexan();
+	else
+		this->error(__func__, "Syntex error", 0x5);
+}
+
+void Parser::warning(const std::string &nameFunc,
+						const std::string &text)
+{
+	std::cerr << "WARNING: in " << nameFunc <<
+		" (" << lineno << ":" << charno << ") " <<
+		text << std::endl;
+}
+
+void Parser::error(const std::string &nameFunc,
+					const std::string &text,
+					int numError)
+{
+	std::cerr << "ERROR " << std::hex << numError <<
+	 	": in " << nameFunc <<
+		" (" << lineno << ":" << charno << ") " <<
+		text << std::endl;
+	exit(numError);
 }
