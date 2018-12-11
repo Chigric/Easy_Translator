@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "logger.h"
 
 //id of symbols
 enum TYPES {NONE = -1, NUM = 256, IF, ELSE, PRINT, LESS, COMPARE, DONE};
@@ -27,3 +28,5 @@ struct SyntacticWord {
         return *this;
     }
 };
+
+extern Logger* logger;

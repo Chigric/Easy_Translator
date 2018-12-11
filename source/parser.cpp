@@ -1,5 +1,4 @@
 #include <iostream>
-//#include <iomanip>
 
 #include <stdio.h>
 #include <ctype.h>
@@ -13,7 +12,6 @@ Parser::Parser()
 	lookahead = NONE;
 
 	curToken = new SyntacticWord;
-	logger = new Logger;
 	iStream = nullptr;
 	lexer = nullptr;
 
@@ -26,8 +24,6 @@ Parser::~Parser()
 		delete curToken;
 	if (lexer != nullptr)
 		delete lexer;
-	if (logger != nullptr)
-		delete logger;
 	if (iStream != nullptr)
 		delete iStream;
 }
@@ -58,8 +54,16 @@ void Parser::printToken()
 void Parser::expr()
 {
 	while (lookahead != DONE) {
-		std::cout << "> expr:\t" << logic() << std::endl;
-		match(';');
+		statement();
+	}
+}
+
+void Parser::statement()
+{
+	switch (lookahead) {
+		case IF:
+			match(IF); match('(');
+			break;
 	}
 }
 
@@ -99,8 +103,9 @@ int Parser::logic()
 
 void Parser::match(int token)
 {
-	if (lookahead == token)
+	if (lookahead == token) {
 		lookahead = lexer->lexan(curToken);
+	}
 	else
 		logger->error(__func__, "Syntex error", 0x5);
 }

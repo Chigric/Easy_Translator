@@ -10,7 +10,6 @@ class Lexer
 {
 private:
     std::ifstream* iStream;
-    Logger* logger;
 
     void commentLine();
     void number(SyntacticWord*, char);

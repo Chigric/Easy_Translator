@@ -2,7 +2,7 @@
 
 #include "logger.h"
 
-Logger::Logger () : lineno(0), charno(0)
+Logger::Logger () : lineno(1), charno(1)
 {}
 
 Logger::~Logger ()
@@ -20,10 +20,11 @@ void Logger::log(const std::string& text)
 }
 
 void Logger::warning(const std::string &nameFunc,
-						const std::string &text)
+						const std::string &text,
+                        const int charMinus)
 {
 	std::cerr << "WARNING: in " << nameFunc <<
-		" (" << lineno << ":" << charno << ") " <<
+		" (" << lineno << ":" << charno - charMinus << ") " <<
 		text << std::endl;
 }
 

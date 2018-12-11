@@ -14,8 +14,6 @@ private:
     std::ifstream* iStream;
     //Lexer
     Lexer* lexer;
-    //Logger
-    Logger* logger;
 
     int lookahead;
 
@@ -23,6 +21,7 @@ private:
 
     //Grammar
     void expr();
+    void statement();
     int logic();
     void match(int);
 public:

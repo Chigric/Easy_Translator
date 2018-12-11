@@ -5,15 +5,10 @@
 Lexer::Lexer(std::ifstream* __iStream)
 {
     this->iStream = __iStream;
-
-    this->logger = new Logger;
 }
 
 Lexer::~Lexer()
-{
-    if (logger != nullptr)
-        delete logger;
-}
+{}
 
 void Lexer::commentLine()
 {
@@ -42,7 +37,7 @@ void Lexer::number(SyntacticWord* curToken, char symbol)
 
 void Lexer::readString(SyntacticWord* curToken, char symbol)
 {
-	while (isalnum(symbol)) {
+	while (isalnum(symbol) || symbol == '_') {
 		curToken->lexbuf.push_back(symbol);
 		nextChar(symbol);
 	}
@@ -85,7 +80,9 @@ const int Lexer::lexan(SyntacticWord* curToken)
         	} else if (curToken->lexbuf == "else") {
         		return ELSE;
         	} else {
-        		logger->warning(__func__, "Unkown word: " + curToken->lexbuf);
+        		logger->warning(__func__,
+                    "Unkown word: " + curToken->lexbuf,
+                    curToken->lexbuf.size());
         		return NONE;
         	}
 
@@ -94,7 +91,6 @@ const int Lexer::lexan(SyntacticWord* curToken)
 			return LESS;
 		} else if (symbol == '=') {		//symbol = operator '='
 		 nextChar(symbol);
-
 			if (symbol == '=') {		//symbol = operator "=="
 				std::cout << "\tlexan (COMPARE) " << symbol << std::endl;
 				return COMPARE;
@@ -105,7 +101,6 @@ const int Lexer::lexan(SyntacticWord* curToken)
 			curToken->token_id = DONE;
 			return DONE;
 		} else {
-			curToken->token_id = NONE;
 			return symbol;
 		}
 	}

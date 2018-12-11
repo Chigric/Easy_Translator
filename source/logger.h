@@ -15,6 +15,6 @@ public:
     void newLine();
 
     void log(const std::string&);
-    void warning(const std::string&, const std::string&);
+    void warning(const std::string&, const std::string&, const int = 0);
     void error(const std::string&, const std::string&, const int);
 };
