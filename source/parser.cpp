@@ -59,7 +59,6 @@ void Parser::expr()
 
 void Parser::statement(const bool locaPrintStatus)
 {
-	printStatus = locaPrintStatus;
 	switch (lookahead) {
 		int tmp;
 		case IF:
@@ -67,34 +66,25 @@ void Parser::statement(const bool locaPrintStatus)
 			tmp = logic();
 			match(')');
 
-			logger->log("\t\t>>> ", tmp);
-
-			logger->log("\t\t<><> 1 ", printStatus);
-			printStatus = (tmp > 0 && printStatus) ? true : false;
-			logger->log("\t\t<><> 2 ", printStatus);
+			printStatus = (tmp > 0 && locaPrintStatus) ? true : false;
 			statement(printStatus);
-			logger->log("\t\t<><> 3 ", printStatus);
-			printStatus = (tmp > 0 && printStatus) ? false : true;
-			logger->log("\t\t<><> 4 ", printStatus);
+			printStatus = (tmp == 0 && locaPrintStatus) ? true : false;
 
 			switch (lookahead) {
 				case ELSE:
 					match(ELSE);
-					statement(locaPrintStatus);
+					statement(printStatus);
 					break;
 				default:
 					break;
 			}
-			printStatus = true;
-
 			break;
-
 		case PRINT:
 			match(PRINT); match('(');
 			tmp = logic();
 			match(')'); match(';');
 			if (printStatus)
-				std::cout << "\t\tTranslator " << tmp << std::endl;
+				std::cout << "Translator " << tmp << std::endl;
 			break;
 		default:
 			logger->error(__func__, "Syntex error", 0x8);
