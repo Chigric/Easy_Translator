@@ -1,4 +1,7 @@
 #include <iostream>
+#include <string>
+
+#include <stdlib.h>
 
 #include "lexer.h"
 
@@ -19,7 +22,8 @@ void Lexer::commentLine()
     getline(static_cast<std::istream&>(*iStream), tmp);
     iStream->unget();
 
-    std::cout << "\tlexan (comment line) " << tmp << std::endl;
+    logger->log("\tlexan (comment line) " + tmp);
+    // std::cout << "\tlexan (comment line) " << tmp << std::endl;
 }
 
 void Lexer::number(SyntacticWord* curToken, char symbol)
@@ -31,8 +35,9 @@ void Lexer::number(SyntacticWord* curToken, char symbol)
         nextChar(symbol);
     }
     iStream->unget();
-    std::cout << "\tlexan (full number) " <<
-        curToken->lexbuf << std::endl;
+    logger->log("\tlexan (full number) " + curToken->lexbuf);
+    // std::cout << "\tlexan (full number) " <<
+    //     curToken->lexbuf << std::endl;
 }
 
 void Lexer::readString(SyntacticWord* curToken, char symbol)
@@ -42,6 +47,9 @@ void Lexer::readString(SyntacticWord* curToken, char symbol)
 		nextChar(symbol);
 	}
 	iStream->unget();
+    logger->log("\tlexan (full string) " + curToken->lexbuf);
+    // std::cout << "\tlexan (full string) " <<
+    //     curToken->lexbuf << std::endl;
 }
 
 const int Lexer::lexan(SyntacticWord* curToken)
@@ -55,8 +63,6 @@ const int Lexer::lexan(SyntacticWord* curToken)
 	while (!(iStream->eof())) {
 		nextChar(symbol);
 
-		std::cout << "lexan " << symbol << std::endl;
-
 		if (symbol == ' ' || symbol == '\t')	//symbol - nothing
 			continue;
 		else if (symbol == '#') {
@@ -68,18 +74,19 @@ const int Lexer::lexan(SyntacticWord* curToken)
             logger->newLine();
 			continue;
 		} else if (isdigit(symbol)) {	//symbol - numeral
-	        std::cout << "\tlexan (digit) " << symbol << std::endl;
             number(curToken, symbol);
 			return NUM;
 
 	    } else if (isalpha(symbol) || symbol == '_') {   //symbol - char
-	        std::cout << "\tlexan (alpha) " << symbol << std::endl;
+            logger->log("lexan (char) " + symbol);
             readString(curToken, symbol);
         	if (curToken->lexbuf == "if") {
         		return IF;
         	} else if (curToken->lexbuf == "else") {
         		return ELSE;
-        	} else {
+        	} else if (curToken->lexbuf == "print") {
+                return PRINT;
+            } else {
         		logger->warning(__func__,
                     "Unkown word: " + curToken->lexbuf,
                     curToken->lexbuf.size());
@@ -87,12 +94,12 @@ const int Lexer::lexan(SyntacticWord* curToken)
         	}
 
 	    } else if (symbol == '<') { 	//symbol - operator '<'
-			std::cout << "\tlexan (LESS) " << symbol << std::endl;
+            logger->log("lexan (LESS) <");
 			return LESS;
 		} else if (symbol == '=') {		//symbol = operator '='
 		 nextChar(symbol);
 			if (symbol == '=') {		//symbol = operator "=="
-				std::cout << "\tlexan (COMPARE) " << symbol << std::endl;
+                logger->log("lexan (COMPARE) ==");
 				return COMPARE;
 			}
 			else
@@ -109,7 +116,7 @@ const int Lexer::lexan(SyntacticWord* curToken)
 
 void Lexer::nextChar(char& _c)
 {
-	if (iStream == nullptr)
+	   if (iStream == nullptr)
 		logger->error(__func__, "ты совсем ку-ку,\niStream = nullptr", 0x2);
 
 	iStream->get(_c);

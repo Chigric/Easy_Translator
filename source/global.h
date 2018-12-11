@@ -4,7 +4,7 @@
 #include "logger.h"
 
 //id of symbols
-enum TYPES {NONE = -1, NUM = 256, IF, ELSE, PRINT, LESS, COMPARE, DONE};
+enum TYPES {NONE = -1, NUM = 256, STRING, IF, ELSE, PRINT, LESS, COMPARE, DONE};
 
 //constants
 static const char EOS = '\0';

@@ -21,9 +21,9 @@ private:
 
     //Grammar
     void expr();
-    void statement();
+    void statement(const bool);
     int logic();
-    void match(int);
+    void match(const int);
 public:
     Parser();
     ~Parser();

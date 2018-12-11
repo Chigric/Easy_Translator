@@ -37,7 +37,6 @@ void Parser::parse(const char* fileName)
 
 	if ((lookahead = lexer->lexan(curToken)) == DONE) {
 		logger->error(__func__, "some problem with lexan", 0x3);
-		exit(0x3);
 	}
 	expr();
 	// this->printToken();
@@ -54,16 +53,51 @@ void Parser::printToken()
 void Parser::expr()
 {
 	while (lookahead != DONE) {
-		statement();
+		statement(true);
 	}
 }
 
-void Parser::statement()
+void Parser::statement(const bool locaPrintStatus)
 {
+	printStatus = locaPrintStatus;
 	switch (lookahead) {
+		int tmp;
 		case IF:
 			match(IF); match('(');
+			tmp = logic();
+			match(')');
+
+			logger->log("\t\t>>> ", tmp);
+
+			logger->log("\t\t<><> 1 ", printStatus);
+			printStatus = (tmp > 0 && printStatus) ? true : false;
+			logger->log("\t\t<><> 2 ", printStatus);
+			statement(printStatus);
+			logger->log("\t\t<><> 3 ", printStatus);
+			printStatus = (tmp > 0 && printStatus) ? false : true;
+			logger->log("\t\t<><> 4 ", printStatus);
+
+			switch (lookahead) {
+				case ELSE:
+					match(ELSE);
+					statement(locaPrintStatus);
+					break;
+				default:
+					break;
+			}
+			printStatus = true;
+
 			break;
+
+		case PRINT:
+			match(PRINT); match('(');
+			tmp = logic();
+			match(')'); match(';');
+			if (printStatus)
+				std::cout << "\t\tTranslator " << tmp << std::endl;
+			break;
+		default:
+			logger->error(__func__, "Syntex error", 0x8);
 	}
 }
 
@@ -96,12 +130,13 @@ int Parser::logic()
 			match(NUM);
 			return answer;
 		default:
+			return stoi(ptr.lexbuf);
 			break;
 	}
-	return ptr.token_id;
+	return NONE;
 }
 
-void Parser::match(int token)
+void Parser::match(const int token)
 {
 	if (lookahead == token) {
 		lookahead = lexer->lexan(curToken);
