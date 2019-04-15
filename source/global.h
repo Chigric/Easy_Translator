@@ -12,21 +12,21 @@ static const char EOS = '\0';
 static bool printStatus = true;
 
 struct SyntacticWord {
-    int token_id;
-    std::string lexbuf;
+	int token_id;
+	std::string lexbuf;
 
-    void clear() {
-        token_id = TYPES::NONE;
-        lexbuf.clear();
-    }
+	void clear() {
+		token_id = TYPES::NONE;
+		lexbuf.clear();
+	}
 
-    SyntacticWord& operator = (const SyntacticWord& ptr) {
-        this->token_id = ptr.token_id;
+	SyntacticWord& operator = (const SyntacticWord& ptr) {
+		this->token_id = ptr.token_id;
 
-        this->lexbuf.clear();
-        this->lexbuf = ptr.lexbuf;
-        return *this;
-    }
+		this->lexbuf.clear();
+		this->lexbuf = ptr.lexbuf;
+		return *this;
+	}
 };
 
 extern Logger* logger;

@@ -10,30 +10,30 @@ Logger::~Logger ()
 
 void Logger::setPrintStatus(const bool _b)
 {
-    this->logStatus = _b;
+	this->logStatus = _b;
 }
 
 void Logger::newLine()
 {
-    charno = 0;
-    this->log("\tlexan (№ lineno) = ", ++lineno);
+	charno = 0;
+	this->log("\tlexan (№ lineno) = ", lineno++);
 }
 
 void Logger::log(const std::string& text)
 {
-    if (logStatus)
-        std::cout << text << std::endl;
+	if (logStatus)
+		std::cout << text << std::endl;
 }
 
 void Logger::log(const std::string& text, const int num)
 {
-    if (logStatus)
-        std::cout << text << num << std::endl;
+	if (logStatus)
+		std::cout << text << num << std::endl;
 }
 
 void Logger::warning(const std::string &nameFunc,
 						const std::string &text,
-                        const int charMinus)
+						const int charMinus)
 {
 	std::cerr << "WARNING: in " << nameFunc <<
 		" (" << lineno << ":" << charno - charMinus << ") " <<
@@ -45,7 +45,7 @@ void Logger::error(const std::string &nameFunc,
 					int numError)
 {
 	std::cerr << "ERROR " << numError <<
-	 	": in " << nameFunc <<
+		": in " << nameFunc <<
 		" (" << lineno << ":" << charno << ") " <<
 		text << std::endl;
 	exit(numError);

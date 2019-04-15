@@ -9,16 +9,21 @@
 class Lexer
 {
 private:
-    std::ifstream* iStream;
+	std::ifstream* iStream;
 
-    void commentLine();
-    void number(SyntacticWord*, char);
-    void readString(SyntacticWord*, char);
-    //Lexer
-    void nextChar(char&);
+	void commentLine();
+	void newLine();
+
+	const int meaningTerm(SyntacticWord*, char);
+	const int keyWords(SyntacticWord*, char);
+	const int operators(SyntacticWord*, char);
+	void number(SyntacticWord*, char);
+	void readString(SyntacticWord*, char);
+	//Lexer
+	void nextChar(char&);
 public:
-    Lexer(std::ifstream* __iStream);
-    ~Lexer();
+	Lexer(std::ifstream* __iStream);
+	~Lexer();
 
-    const int lexan(SyntacticWord*);
+	const int lexan(SyntacticWord*);
 };

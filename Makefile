@@ -23,7 +23,7 @@ OBJECTS = $(addprefix $(OBJ_DIR)/,$(SOURCES:.cpp=.o))
 EXECUTABLE = $(OBJ_DIR)/work.a
 DATA = data/input.txt
 
-.PHONY: all clean do
+.PHONY: all clean do run
 
 all: $(EXECUTABLE)
 
@@ -40,3 +40,5 @@ clean:
 
 do: all
 	./$(EXECUTABLE) $(DATA)
+
+run: all

@@ -31,7 +31,7 @@ Parser::~Parser()
 void Parser::parse(const char* fileName)
 {
 	iStream = new std::ifstream;
-    iStream->open(fileName, std::ifstream::in);
+	iStream->open(fileName, std::ifstream::in);
 
 	lexer = new Lexer(iStream);
 
@@ -41,7 +41,7 @@ void Parser::parse(const char* fileName)
 	expr();
 	// this->printToken();
 
-    iStream->close();
+	iStream->close();
 }
 
 void Parser::printToken()

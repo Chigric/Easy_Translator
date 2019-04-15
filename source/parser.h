@@ -10,23 +10,23 @@
 class Parser
 {
 private:
-    SyntacticWord* curToken;
-    std::ifstream* iStream;
-    //Lexer
-    Lexer* lexer;
+	SyntacticWord* curToken;
+	std::ifstream* iStream;
+	//Lexer
+	Lexer* lexer;
 
-    int lookahead;
+	int lookahead;
 
-    void printToken();
+	void printToken();
 
-    //Grammar
-    void expr();
-    void statement(const bool);
-    int logic();
-    void match(const int);
+	//Grammar
+	void expr();
+	void statement(const bool);
+	int logic();
+	void match(const int);
 public:
-    Parser();
-    ~Parser();
+	Parser();
+	~Parser();
 
-    void parse(const char*);
+	void parse(const char*);
 };
