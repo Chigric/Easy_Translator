@@ -33,6 +33,9 @@ void Parser::parse(const char* fileName)
 	iStream = new std::ifstream;
 	iStream->open(fileName, std::ifstream::in);
 
+	if (!iStream->is_open())
+        logger->error(__func__, "no file specified", 0x9);
+
 	lexer = new Lexer(iStream);
 
 	if ((lookahead = lexer->lexan(curToken)) == DONE) {

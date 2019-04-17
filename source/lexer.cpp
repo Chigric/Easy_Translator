@@ -54,9 +54,9 @@ void Lexer::newLine()
 	logger->newLine();
 }
 
-const int Lexer::keyWords(SyntacticWord* curToken, char symbol)
+int Lexer::keyWords(SyntacticWord* curToken, char symbol)
 {
-	logger->log("lexan (char) " + symbol);
+	logger->log("lexan (char) " + (std::string) &symbol);
 	readString(curToken, symbol);
 
 	if (curToken->lexbuf == "if") {
@@ -73,7 +73,7 @@ const int Lexer::keyWords(SyntacticWord* curToken, char symbol)
 	}
 }
 
-const int Lexer::operators(SyntacticWord* curToken, char symbol)
+int Lexer::operators(SyntacticWord* curToken, char symbol)
 {
 	switch (symbol) {	//symbol - operator
 		case '<':		//symbol - operator '<'
@@ -96,19 +96,19 @@ const int Lexer::operators(SyntacticWord* curToken, char symbol)
 	}
 }
 
-const int Lexer::meaningTerm(SyntacticWord* curToken, char symbol)
+int Lexer::meaningTerm(SyntacticWord* curToken, char symbol)
 {
 	if (isdigit(symbol)) {	//symbol - numeral
 	   number(curToken, symbol);
 	   return NUM;
 	} else if (isalpha(symbol) || symbol == '_') {   //symbol - char
-		keyWords(curToken, symbol);
+		return keyWords(curToken, symbol);
 	} else {
-		operators(curToken, symbol);
+		return operators(curToken, symbol);
 	}
 }
 
-const int Lexer::lexan(SyntacticWord* curToken)
+int Lexer::lexan(SyntacticWord* curToken)
 {
 	curToken->clear();
 
@@ -130,7 +130,7 @@ const int Lexer::lexan(SyntacticWord* curToken)
 				this->newLine();
 				continue;
 			default:
-				meaningTerm(curToken, symbol);
+				return meaningTerm(curToken, symbol);
 		   }
 	   }
 	return DONE;

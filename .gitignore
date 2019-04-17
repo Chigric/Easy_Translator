@@ -8,3 +8,6 @@
 
 # Objects files
 *.o
+
+# Compiler files
+.cson

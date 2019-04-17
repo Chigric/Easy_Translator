@@ -14,9 +14,9 @@ private:
 	void commentLine();
 	void newLine();
 
-	const int meaningTerm(SyntacticWord*, char);
-	const int keyWords(SyntacticWord*, char);
-	const int operators(SyntacticWord*, char);
+	int meaningTerm(SyntacticWord*, char);
+	int keyWords(SyntacticWord*, char);
+	int operators(SyntacticWord*, char);
 	void number(SyntacticWord*, char);
 	void readString(SyntacticWord*, char);
 	//Lexer
@@ -25,5 +25,5 @@ public:
 	Lexer(std::ifstream* __iStream);
 	~Lexer();
 
-	const int lexan(SyntacticWord*);
+	int lexan(SyntacticWord*);
 };
