@@ -36,7 +36,7 @@ void Logger::warning(const std::string &nameFunc,
 						const int charMinus)
 {
 	std::cerr << "WARNING: in " << nameFunc <<
-		" (" << lineno << ":" << charno - charMinus << ") " <<
+		" (" << lineno << ":" << charno - charMinus - 2 << ") " <<
 		text << std::endl;
 }
 

@@ -2,9 +2,17 @@
 #34<5;
 #6==6;
 #kak;
-if (9<10) if(7==7) print(7); else print(10); else print(9);
-if (9<10) if(8==7) print(7); else print(10); else print(9);
-if (11<10) if(7==7) print(7); else print(10); else print(9);
-if (11<10) if(8==7) print(7); else print(10); else print(9);
-if (9<10) print (9);
-print (15);
+
+# if [-else]
+#if (9<10) if(7==7) print(7); else print(10); else print(9);
+#if (9<10) if(8==7) print(7); else print(10); else print(9);
+#if (11<10) if(7==7) print(7); else print(10); else print(9);
+#if (11<10) if(8==7) print(7); else print(10); else print(9);
+#if (9<10) print (9);
+#print (15);
+
+# Variables
+bool HELLO = true;
+int HELLO = 4;
+real HELLO = 5.6;
+string HELLO = "string work!";

@@ -6,10 +6,14 @@
 
 #include "parser.h"
 
+/*/////////////////////////////////*/std::string __nameG__ = "";//////////
+
 Parser::Parser()
 {
 	printStatus = true;
 	lookahead = NONE;
+
+	varTable = new std::set<Variable*>();
 
 	curToken = new SyntacticWord;
 	iStream = nullptr;
@@ -26,6 +30,8 @@ Parser::~Parser()
 		delete lexer;
 	if (iStream != nullptr)
 		delete iStream;
+	if (varTable != nullptr)
+		delete varTable;
 }
 
 void Parser::parse(const char* fileName)
@@ -89,6 +95,23 @@ void Parser::statement(const bool locaPrintStatus)
 			if (printStatus)
 				std::cout << "Translator " << tmp << std::endl;
 			break;
+		case VAR:
+			lexer->isCreating = true;
+			match(VAR);
+			create(__nameG__);
+			switch (lookahead) {
+				case ';':
+					match(';');
+					break;
+				case ASSIGN:
+					match(ASSIGN);
+					assign(__nameG__);
+					match(';');
+					break;
+				default:
+					break;
+			}
+			break;
 		default:
 			logger->error(__func__, "Syntex error", 0x8);
 	}
@@ -133,7 +156,28 @@ void Parser::match(const int token)
 {
 	if (lookahead == token) {
 		lookahead = lexer->lexan(curToken);
-	}
-	else
+	} else
 		logger->error(__func__, "Syntex error", 0x5);
+}
+
+void Parser::create(std::string& name)
+{
+	name = curToken->lexbuf;
+//	if (token == NAME) {
+		curToken->token_id = lexer->idTypeVar;
+
+		Variable var(curToken->lexbuf, lexer->idTypeVar);
+		varTable->insert(&var);
+
+		lexer->isCreating = false;
+//	}
+
+	lookahead = lexer->lexan(curToken);
+}
+
+void Parser::assign(std::string& name)
+{
+	logger->log(name);
+
+	lookahead = lexer->lexan(curToken);
 }

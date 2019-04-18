@@ -8,6 +8,9 @@
 Lexer::Lexer(std::ifstream* __iStream)
 {
 	this->iStream = __iStream;
+
+	isCreating = false;
+	idTypeVar = NONE;
 }
 
 Lexer::~Lexer()
@@ -29,7 +32,7 @@ void Lexer::number(SyntacticWord* curToken, char symbol)
 {
 	curToken->token_id = NUM;
 
-	while (isdigit(symbol)) {
+	while (isdigit(symbol) || symbol == '.') {
 		curToken->lexbuf.push_back(symbol);
 		nextChar(symbol);
 	}
@@ -54,6 +57,18 @@ void Lexer::newLine()
 	logger->newLine();
 }
 
+void Lexer::chooseTypeVar(std::string& str)
+{
+	if (str == "bool")
+		idTypeVar = BOOL;
+	if (str == "int")
+		idTypeVar = INT;
+	if (str == "real")
+		idTypeVar = REAL;
+	if (str == "string")
+		idTypeVar = STRING;
+}
+
 int Lexer::keyWords(SyntacticWord* curToken, char symbol)
 {
 	logger->log("lexan (char) " + (std::string) &symbol);
@@ -65,12 +80,32 @@ int Lexer::keyWords(SyntacticWord* curToken, char symbol)
 		return ELSE;
 	} else if (curToken->lexbuf == "print") {
 		return PRINT;
+	} else if (curToken->lexbuf == "bool" ||
+				curToken->lexbuf == "int" ||
+				curToken->lexbuf == "real" ||
+				curToken->lexbuf == "string")
+	{
+		chooseTypeVar(curToken->lexbuf);
+		return VAR;
 	} else {
-		logger->warning(__func__,
-			"Unkown word: " + curToken->lexbuf,
-			curToken->lexbuf.size());
+		if (!isCreating) {
+			logger->warning(__func__,
+					"Unkown word: " + curToken->lexbuf,
+					curToken->lexbuf.size());
+		}
 		return NONE;
 	}
+}
+
+void Lexer::stringLine(SyntacticWord* curToken)
+{
+	std::string strWord;
+	do {
+		std::getline((std::istream&)*iStream, strWord, '\"');
+		curToken->lexbuf += strWord;
+	} while (strWord == "\"");
+
+	logger->log("lexan (string) " + curToken->lexbuf);
 }
 
 int Lexer::operators(SyntacticWord* curToken, char symbol)
@@ -85,7 +120,10 @@ int Lexer::operators(SyntacticWord* curToken, char symbol)
 				logger->log("lexan (COMPARE) ==");
 				return COMPARE;
 			} else
-				return NONE;
+				return ASSIGN;
+		case '"':
+			stringLine(curToken);
+			return STRING;
 		default:
 			if (iStream->eof()) {
 				curToken->token_id = DONE;
